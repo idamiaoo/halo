@@ -42,6 +42,7 @@ type Session struct {
 
 // Create new session instance
 func NewSession(entity NetworkEntity) *Session {
+	service.Connections.Increment()
 	return &Session{
 		ID:        service.Connections.SessionID(),
 		Entity:    entity,

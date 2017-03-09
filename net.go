@@ -5,6 +5,7 @@ import (
 	"net"
 	"sync"
 
+	"github.com/bohler/halo/service"
 	log "github.com/bohler/lib/dlog"
 )
 
@@ -64,6 +65,19 @@ func (net *netService) Multicast(aids []int64, route string, data []byte) {
 
 // Close session
 func (net *netService) CloseSession(session *Session) {
+	net.sessionCloseCbLock.RLock()
+	for _, cb := range net.sessionCloseCb {
+		if cb != nil {
+			cb(session)
+		}
+	}
+	net.sessionCloseCbLock.RUnlock()
+	net.Lock()
+	defer net.Unlock()
+	if agent, ok := net.agents[session.Entity.ID()]; ok && agent != nil {
+		delete(net.agents, session.Entity.ID())
+		service.Connections.Decrement()
+	}
 
 }
 

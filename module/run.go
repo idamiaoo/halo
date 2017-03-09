@@ -15,7 +15,8 @@ func Run(mods ...Module) {
 	Init()
 
 	c := make(chan os.Signal)
-	signal.Notify(c, os.Interrupt, os.Kill, syscall.SIGINT)
+	signal.Notify(c, syscall.SIGKILL, syscall.SIGINT)
+	log.Log.Debug("running...")
 	sig := <-c
 	log.Log.Warningf("App shutdown (siggal: %v)", sig)
 	Destroy()
